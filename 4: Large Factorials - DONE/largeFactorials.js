@@ -22,7 +22,7 @@
 function arrNumMult(arr, num) {
   // initial multiplication simply multiplies each digit by the number. save each 'digit' as a string for later manipulation
   const initMult = [...arr].map(el => String(el * num));
-  console.log(initMult);
+  // console.log(initMult);
 
   // now, carry values. iterate backwards through array
 
@@ -34,7 +34,7 @@ function arrNumMult(arr, num) {
 function carry(digitsArr) {
 
   const digitsStringArr = digitsArr.map(el => String(el));
-  console.log(digitsStringArr);
+  // console.log(digitsStringArr);
 
   // deal with all digits except the first. first digit dealt with separately
   for (let i = digitsArr.length - 1; i > 0; i--) {
@@ -64,20 +64,46 @@ console.log('arrNumMult([2,4,6,8], 2), expect [4, 9, 3, 6]:', arrNumMult([2, 4, 
 
 // first, module for array addition
 function arrAdd(arr1, arr2) {
-  let outputArr = []
   const length = arr1.length > arr2.length ? arr1.length : arr2.length;
-  for (let i=0; i<length; i++) {
-    outputArr.push()
-  }
+
+  // give both arrays leading zeroes until they are the length of the longer array
+  while (arr1.length < length) arr1.unshift(0);
+  while (arr2.length < length) arr2.unshift(0);
+  return arr1.map((el, i) => el + arr2[i])
 }
+
+console.log('arrAdd([1,2,3], [4,5]); expect [1,6,8]:', arrAdd([1, 2, 3], [4, 5]))
 
 // order does not matter (length)
 // remember to correct for 10s digit
 
 function arrArrMult(arr1, arr2) {
-
+  let output = []
   // iterate backwards to simplify adding 0s
   for (let i = arr1.length - 1; i >= 0; i--) {
-
+    const multArr = arrNumMult(arr2, arr1[i]);
+    console.log(`multArr for arr1[${i}] (${arr1[i]}): ${multArr}`)
+    // correct for digit place
+    for (let j=0; j<arr1.length-i-1; j++) {
+      multArr.push(0)
+    }
+    output = arrAdd(output, multArr)
   }
+  return carry(output)
 }
+
+console.log('arrArrMult([1, 2, 3], [4, 5]); expect [5,5,3,5]', arrArrMult([1, 2, 3], [4, 5]));
+console.log('arrArrMult([2,7,5,8,3,9,0], [3,7,3,4,1,2]); expect [1,0,3,0,0,1,5,9,2,6,6,8,0]:', arrArrMult([2,7,5,8,3,9,0], [3,7,3,4,1,2]))
+
+// ----------------- STEP 3: apply to factorials -------------------
+
+function factorial(n) {
+  let output = [1];
+  for (let i=0; i<n; i++) {
+    const stringArr = String(n-i).split('').map(el=>Number(el))
+    output = arrArrMult(output,stringArr)
+  }
+  return output.join('')
+}
+
+console.log('factorial(5); expect 120:', factorial(5))
